@@ -1,3 +1,5 @@
+// need to change prompts to make the user insert inputs of the item id and how many items the user would like to purchase then subtract from the database.
+
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require("cli-table3");
@@ -12,24 +14,23 @@ var connection = mysql.createConnection({
     database: login.database
 });
 
-// connection.connect(function(err) {
-//     if (err) throw err;
-//     console.log("connection made with server at " + connection.threadId);
-//     initShop();
-// });
-
-displayTable();
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log("connection made with server at " + connection.threadId);
+    initShop();
+});
 
 function displayTable() {
     connection.query("SELECT * FROM rockinzon_db.products", function(err, res) {
         if (err) throw err;
         var table = new Table({
-            head: ["Name", "Price", "Quantity"],
-            colWidths: [40, 40]
+            head: ["Id", "Name", "Price", "Quantity"],
+            colWidths: [20, 40, 20, 20]
         });
 
         for (var i = 0; i < res.length; i++) {
             table.push([
+                res[i].item_id,
                 res[i].product_name,
                 "$" + res[i].price + ".00",
                 res[i].stock_quantity
@@ -41,6 +42,7 @@ function displayTable() {
 }
 
 function initShop() {
+    displayTable();
     connection.query(
         "SELECT item_id, product_name, price FROM rockinzon_db.products",
         function(err, result) {
