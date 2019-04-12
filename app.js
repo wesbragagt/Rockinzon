@@ -67,39 +67,60 @@ function initShop() {
                         [productChosen],
                         function(err, res) {
                             if (err) throw err;
+                            var itemStock = res[0].stock_quantity;
                             var itemName = res[0].product_name;
                             var itemPrice = "$" + res[0].price + ".00";
                             inquirer
                                 .prompt([
                                     {
-                                        type: "list",
-                                        name: "choice",
+                                        type: "input",
+                                        name: "howMany",
                                         message:
-                                            "Would you like to purchase a " +
-                                            itemName +
-                                            " for " +
-                                            itemPrice +
-                                            "?",
-                                        choices: ["Yes", "No"]
+                                            "How many would you like to purchase?",
+                                        validate: function(value) {
+                                            if (isNaN(value) === false) {
+                                                return true;
+                                            }
+                                            return false;
+                                        }
                                     }
                                 ])
                                 .then(function(answers) {
-                                    var confirm = answers.choice;
-
-                                    if (confirm === "Yes") {
+                                    var quantity = answers.howMany;
+                                    console.log(quantity);
+                                    if (quantity <= itemStock) {
                                         //change stock quantity on mysql
+                                        var minusQuantity =
+                                            "UPDATE rockinzon_db.products SET stock_quantity = stock_quantity" +
+                                            " - " +
+                                            quantity;
+
                                         connection.query(
-                                            "UPDATE rockinzon_db.products SET stock_quantity = stock_quantity - 1  WHERE product_name=?",
+                                            minusQuantity +
+                                                " WHERE product_name=?",
                                             [productChosen],
                                             function(err, res) {
                                                 if (err) throw err;
                                                 console.log(
-                                                    "congrats on your purchase"
+                                                    "Congrats on your purchase, you've bought " +
+                                                        quantity +
+                                                        " " +
+                                                        productChosen
                                                 );
+                                                setTimeout(function() {
+                                                    console.clear();
+                                                    initShop();
+                                                }, 3000);
                                             }
                                         );
                                     } else {
-                                        initShop();
+                                        console.log(
+                                            "sorry, the item is not available anymore"
+                                        );
+                                        setTimeout(function() {
+                                            console.clear();
+                                            initShop();
+                                        }, 3000);
                                     }
                                 });
                         }
