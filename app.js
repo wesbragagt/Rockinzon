@@ -69,6 +69,7 @@ function initShop() {
                             if (err) throw err;
                             var itemStock = res[0].stock_quantity;
                             var itemName = res[0].product_name;
+                            var numberPrice = parseFloat(res[0].price);
                             var itemPrice = "$" + res[0].price + ".00";
                             inquirer
                                 .prompt([
@@ -105,12 +106,16 @@ function initShop() {
                                                     "Congrats on your purchase, you've bought " +
                                                         quantity +
                                                         " " +
-                                                        productChosen
+                                                        productChosen +
+                                                        " for " +
+                                                        "$" +
+                                                        numberPrice * quantity +
+                                                        ".00"
                                                 );
                                                 setTimeout(function() {
                                                     console.clear();
                                                     initShop();
-                                                }, 3000);
+                                                }, 5000);
                                             }
                                         );
                                     } else {
@@ -120,7 +125,7 @@ function initShop() {
                                         setTimeout(function() {
                                             console.clear();
                                             initShop();
-                                        }, 3000);
+                                        }, 5000);
                                     }
                                 });
                         }
